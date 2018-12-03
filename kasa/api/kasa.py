@@ -1,6 +1,6 @@
 import socket
 import json
-from struct import pack
+from struct import pack, unpack
 
 
 class Kasa:
@@ -13,20 +13,20 @@ class Kasa:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_sock:
             tcp_sock.connect((self.host, self.port))
             tcp_sock.send(self._encrypt(cmd))
+            size_data = tcp_sock.recv(4)
+            size = self._get_size(size_data)
+            assert(0 <= size < 2**16)
             data = b''
-            while True:
-                chunk = tcp_sock.recv(2048)
-                if chunk:
-                    data += chunk
-                if not chunk or len(chunk) < 2048:
-                    break
-        return self._decrypt(data[4:])
+            while size > 0:
+                buff = tcp_sock.recv(size)
+                if buff:
+                    size -= len(buff)
+                    data += buff
+        return self._decrypt(data)
 
     def _send_json_command(self, cmd):
         js = json.dumps(cmd)
         data = self._send_raw_command(js)
-        print(data)
-        print(len(data))
         return json.loads(data)
 
     def _send_command(self, topic, cmd, arg=None):
@@ -44,6 +44,10 @@ class Kasa:
             key = a
             result += bytes([a])
         return result
+
+    @staticmethod
+    def _get_size(data):
+        return unpack('>I', data)[0]
 
     @staticmethod
     def _decrypt(data):

@@ -5,6 +5,14 @@ def run():
     plug = HS110("192.168.0.214")
     print(plug.get_info())
     print(plug.get_name())
+    print(plug.get_realtime())
+    print(plug.get_power())
+    print(plug.get_stats())
+
+    plug = HS110("192.168.0.213")
+    print(plug.get_info())
+    print(plug.get_name())
+    print(plug.get_realtime())
     print(plug.get_power())
     print(plug.get_stats())
 
