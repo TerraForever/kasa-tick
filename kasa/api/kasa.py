@@ -5,11 +5,17 @@ from struct import pack, unpack
 
 class Kasa:
 
-    def __init__(self, host, port=9999):
-        self.host = host
-        self.port = port
+    def __init__(self, host : str, port=9999):
+        self.host : str = host
+        self.port : int = port
 
-    def _send_raw_command(self, cmd):
+    def get_host(self) -> str:
+        return self.host
+
+    def get_port(self) -> int:
+        return self.port
+
+    def _send_raw_command(self, cmd : str) -> str:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_sock:
             tcp_sock.connect((self.host, self.port))
             tcp_sock.send(self._encrypt(cmd))
@@ -24,7 +30,7 @@ class Kasa:
                     data += buff
         return self._decrypt(data)
 
-    def _send_json_command(self, cmd):
+    def _send_json_command(self, cmd : str):
         js = json.dumps(cmd)
         data = self._send_raw_command(js)
         return json.loads(data)
@@ -35,7 +41,7 @@ class Kasa:
         return js[topic][cmd]
 
     @staticmethod
-    def _encrypt(string):
+    def _encrypt(string : str) -> bytes:
         bytea = bytes(string, 'UTF-8')
         key = 171
         result = pack('>I', len(string))
@@ -46,11 +52,11 @@ class Kasa:
         return result
 
     @staticmethod
-    def _get_size(data):
+    def _get_size(data : bytes) -> int:
         return unpack('>I', data)[0]
 
     @staticmethod
-    def _decrypt(data):
+    def _decrypt(data : bytes) -> str:
         key = 171
         result = b""
         for i in data:
