@@ -1,6 +1,6 @@
 import json
 from json import JSONEncoder
-from typing import List
+from typing import List, Dict
 
 import nmap
 
@@ -12,7 +12,7 @@ from api.kasa import Kasa
 MODELS = {'HS': HS, 'HS100': HS100, 'HS110': HS110}
 
 
-class Discovery:
+class Home:
     def __init__(self, domain='192.168.0.0/24', port=9999, progs=('/mnt/c/Program Files (x86)/Nmap/nmap.exe', 'nmap')):
         self.domain : str = domain
         self.port : int = port
@@ -30,7 +30,10 @@ class Discovery:
             return self.hs[model]
         return []
 
-    def load(self, cache='kasa.json'):
+    def get_dict(self) -> Dict[str, List[Kasa]]:
+        return self.hs
+
+    def load(self, cache='home.json'):
         # Load file
         with open(cache, 'rb') as fp:
             raw : bytes = fp.read()
@@ -45,9 +48,9 @@ class Discovery:
                 clazz : Kasa.__class__ = MODELS[model]
                 self.hs[model] = [clazz(host) for name, host in items]
 
-    def save(self, cache='kasa.json'):
+    def save(self, cache='home.json'):
         # JSON encode
-        encoder = Discovery.CustomEncoder()
+        encoder = Home.CustomEncoder()
         data = encoder.encode(self.hs)
 
         # Write to file
@@ -69,9 +72,8 @@ class Discovery:
                 # Generic HS
                 hs = HS(host)
                 try:
-                    print('Getting scan from {}'.format(host))
+                    print('Getting info from {}'.format(host))
                     info = hs.get_info()
-                    print(info)
                     print('Successfully discovered: {} - {}'.format(info['alias'], host))
 
                     model = info['model']
@@ -82,13 +84,8 @@ class Discovery:
                     else:
                         self.hs.setdefault('HS', []).append(hs)
 
-                except:
+                except (ConnectionError, BlockingIOError):
                     continue
-
-
-
-        print(self.hs)
-        self.save()
 
     class CustomEncoder(JSONEncoder):
         def default(self, o):

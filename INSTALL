@@ -1,4 +1,0 @@
-# Python
-pip install python-nmap
-
-# When running this suite in WSL, you must be install nmap for Windows because nmap (Linux binary) does not work as expected. But nmap.exe can be run correctly in WSL!
