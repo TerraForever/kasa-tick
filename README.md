@@ -1,6 +1,9 @@
 # Kasa-Tick Integration
 Offers integration between TP-link smart plugs and the time series framework TICK stack.
 
+## Acknowledgment ##
+Without the tremendous effort from https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/ this modest package would not have been possible.
+
 ## Dependencies ##
 ### Ubuntu / Raspbian ###
 `apt-get install python3 python3-pip nmap

@@ -9,10 +9,10 @@ from api.hs110 import HS110
 
 
 class KasaTick:
-    def __init__(self, home='home'):
+    def __init__(self, home='home', domain='192.168.0.0/24'):
         self.home : str = home
         self.home_file : str = 'dat/{}.json'.format(home)
-        self.domain : str = '192.168.0.0/24'
+        self.domain : str = domain
         self._home : Home = None
         self._tick : HttpClient = None
 
@@ -41,21 +41,26 @@ class KasaTick:
         self._tick = HttpClient(host='localhost', port=8186)
 
     def _do_tick_tack(self):
+        # Get HS110 plugs
         plugs : List[HS110] = self._home.get_items('HS110')
         home_power = 0
+
+        # Iterate over plugs
         for plug in plugs:
+            # Get plug info
             name = plug.get_name()
             power = plug.get_power()
             home_power += power
             sanitized = name.replace(' ', '_').lower()
             # https://github.com/paksu/pytelegraf
             print(sanitized, power)
+
+            # Send to TICK
             self._tick.metric(sanitized, {'power': power})
 
+        # Send summed power to TICK
         print(self.home, home_power)
         self._tick.metric(self.home, home_power)
-
-
 
 
 kasa = KasaTick()

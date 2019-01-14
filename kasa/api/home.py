@@ -58,24 +58,25 @@ class Home:
             fp.write(bytes(data, 'utf-8'))
 
     def discover(self):
+        # Scan domain
         nm = nmap.PortScanner(nmap_search_path=self.progs)
         print('Scanning {}:{}'.format(self.domain, self.port))
         nm.scan(hosts=self.domain, ports=str(self.port), sudo=False, arguments='-sT' )
 
+        # Iterate over results
         for host in nm.all_hosts():
-
             scan : nmap.PortScannerHostDict = nm[host]
-
             if scan.has_tcp(self.port):
+                # Generic HS on Kasa port
                 print('Discovered {}'.format(host))
-
-                # Generic HS
                 hs = HS(host)
                 try:
+                    # Attempt to communicate with the plug
                     print('Getting info from {}'.format(host))
                     info = hs.get_info()
                     print('Successfully discovered: {} - {}'.format(info['alias'], host))
 
+                    # Detect model
                     model = info['model']
                     if 'HS100' in model:
                         self.hs.setdefault('HS100', []).append(HS100(host))

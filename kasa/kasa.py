@@ -2,12 +2,12 @@
 from datetime import datetime
 
 from api.home import Home
+from api.hs100 import HS100
 from api.hs110 import HS110
 
 
-def run():
+def run(domain='192.168.0.0/24'):
     # Create home and load devices
-    domain = '192.168.0.0/24'
     home = Home(domain=domain)
     try:
         print('Loading home: {}'.format(datetime.now()))
@@ -23,22 +23,20 @@ def run():
     print('Devices')
     print(home.get_dict())
 
-    print(home.get_items('HS100'))
-    print(home.get_all_items())
+    # Loop over HS100 plugs
+    plug : HS100
+    for plug in home.get_items('HS100'):
+        print(plug.get_info())
+        print(plug.get_name())
 
-    plug = HS110("192.168.0.214")
-    print(plug.get_info())
-    print(plug.get_name())
-    print(plug.get_realtime())
-    print(plug.get_power())
-    print(plug.get_stats())
-
-    plug = HS110("192.168.0.213")
-    print(plug.get_info())
-    print(plug.get_name())
-    print(plug.get_realtime())
-    print(plug.get_power())
-    print(plug.get_stats())
+    # Loop over HS100 plugs
+    plug : HS110
+    for plug in home.get_items('HS110'):
+        print(plug.get_info())
+        print(plug.get_name())
+        print(plug.get_realtime())
+        print(plug.get_power())
+        print(plug.get_stats())
 
 
 run()
