@@ -13,19 +13,19 @@ Without the tremendous effort from https://www.softscheck.com/en/reverse-enginee
 pip3 install python-nmap 'pytelegraf[http]'
 ```
 
-Install the TICK stack using this guide: https://www.digitalocean.com/community/tutorials/how-to-monitor-system-metrics-with-the-tick-stack-on-ubuntu-16-04
+Install the TICK stack using this guide:
+* Ubuntu: https://www.digitalocean.com/community/tutorials/how-to-monitor-system-metrics-with-the-tick-stack-on-ubuntu-16-04
+* Raspbian: https://www.influxdata.com/blog/running-the-tick-stack-on-a-raspberry-pi/
 
 ### WSL ###
 ```apt-get install python3 python3-pip
 pip3 install python-nmap 'pytelegraf[http]
 ```
-
-Install nmap for Windows because nmap in WSL does not work as expected. nmap.exe can be correctly invoked from WSL and this package will do this on WSL.
-Install the TICK stack using this guide
+* Install nmap for Windows because nmap in WSL does not work as expected. nmap.exe can be correctly invoked from WSL and this package will do this on WSL.
 
 ### Configuration of Telegraf ###
 Modify the telegraf configuration file:
-```./telegraf --input-filter http_listener config > telegraf.conf
+```./telegrafl > telegraf.conf
 nano telegraf.conf
 # In the section [[inputs.http_listener]] change the first option to: service_address = "localhost:8186"
 # Comment the TLS lines (tls_allowed_cacerts, tls_cert, tls_key), HTTPS is not required because the server is listening on localhost only.

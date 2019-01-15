@@ -24,13 +24,11 @@ def run(domain='192.168.0.0/24'):
     print(home.get_dict())
 
     # Loop over HS100 plugs
-    plug : HS100
     for plug in home.get_items('HS100'):
         print(plug.get_info())
         print(plug.get_name())
 
     # Loop over HS100 plugs
-    plug : HS110
     for plug in home.get_items('HS110'):
         print(plug.get_info())
         print(plug.get_name())
