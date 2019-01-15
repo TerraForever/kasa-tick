@@ -45,7 +45,7 @@ class Home:
         # Iterate of the data
         for model, items in map.items():
             if model in MODELS:
-                clazz : Kasa.__class__ = MODELS[model]
+                clazz = MODELS[model]
                 self.hs[model] = [clazz(host) for name, host in items]
 
     def save(self, cache='home.json'):
@@ -65,7 +65,7 @@ class Home:
 
         # Iterate over results
         for host in nm.all_hosts():
-            scan : nmap.PortScannerHostDict = nm[host]
+            scan = nm[host]
             if scan.has_tcp(self.port):
                 # Generic HS on Kasa port
                 print('Discovered {}'.format(host))

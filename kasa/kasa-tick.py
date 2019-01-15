@@ -42,7 +42,7 @@ class KasaTick:
 
     def _do_tick_tack(self):
         # Get HS110 plugs
-        plugs : List[HS110] = self._home.get_items('HS110')
+        plugs = self._home.get_items('HS110')
         home_power = 0
 
         # Iterate over plugs
