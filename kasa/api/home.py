@@ -1,4 +1,5 @@
 import json
+import os
 from json import JSONEncoder
 from typing import List, Dict
 
@@ -19,9 +20,6 @@ class Home:
         self.progs = progs
         self.hs = {}
 
-    def reset(self):
-        self.hs = {}
-
     def get_all_items(self) -> List[Kasa]:
         return [item for items in self.hs.values() for item in items]
 
@@ -33,7 +31,7 @@ class Home:
     def get_dict(self) -> Dict[str, List[Kasa]]:
         return self.hs
 
-    def load(self, cache='home.json'):
+    def load(self, cache='dat/home.json'):
         # Load file
         with open(cache, 'rb') as fp:
             raw = fp.read()
@@ -48,7 +46,7 @@ class Home:
                 clazz = MODELS[model]
                 self.hs[model] = [clazz(host) for name, host in items]
 
-    def save(self, cache='home.json'):
+    def save(self, cache='dat/home.json'):
         # JSON encode
         encoder = Home.CustomEncoder()
         data = encoder.encode(self.hs)

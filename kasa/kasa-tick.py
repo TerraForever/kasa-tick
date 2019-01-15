@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-from datetime import datetime
-from typing import List
+import argparse
 
 from telegraf import HttpClient  # https://github.com/paksu/pytelegraf
 
 from api.home import Home
-from api.hs110 import HS110
 
 
 class KasaTick:
-    def __init__(self, home='home', domain='192.168.0.0/24'):
-        self.home = home
+    def __init__(self, domain, home, reset=False):
+        self.home_name = home
         self.home_file = 'dat/{}.json'.format(home)
         self.domain = domain
-        self._home = None
-        self._tick = None
+        self.reset = reset
+        self.home = None
+        self.tick = None
 
     def run(self):
         # Connect to home and tick
@@ -25,27 +24,35 @@ class KasaTick:
         self._do_tick_tack()
 
     def _connect_home(self):
-        # Create home and load devices
-        self._home = Home(domain=self.domain)
-        try:
-            print('Loading home: {}'.format(datetime.now()))
-            self._home.load(cache=self.home_file)
-        except FileNotFoundError:
+        # Create home
+        self.home = Home(domain=self.domain)
+
+        # Load saved home
+        if not self.reset:
+            try:
+                print('Loading home: {}'.format(self.home_file))
+                self.home.load(cache=self.home_file)
+            except FileNotFoundError:
+                pass
+
+        # Discover home
+        if not self.home.get_all_items():
             print('Saved home not found, discovering devices on {}'.format(self.domain))
-            self._home.discover()
-            print('Discovered {} devices'.format(len(self._home.get_all_items())))
-            self._home.save(cache=self.home_file)
-            print('Saved home info')
+            self.home.discover()
+            print('Discovered {} devices'.format(len(self.home.get_all_items())))
+            self.home.save(cache=self.home_file)
+            print('Saved home info: {}'.format(self.home_file))
 
     def _connect_tick(self):
-        self._tick = HttpClient(host='localhost', port=8186)
+        self.tick = HttpClient(host='localhost', port=8186)
 
     def _do_tick_tack(self):
         # Get HS110 plugs
-        plugs = self._home.get_items('HS110')
+        plugs = self.home.get_items('HS110')
         home_power = 0
 
         # Iterate over plugs
+        print('Querying {} HS110 plugs'.format(len(plugs)))
         for plug in plugs:
             # Get plug info
             name = plug.get_name()
@@ -53,15 +60,23 @@ class KasaTick:
             home_power += power
             sanitized = name.replace(' ', '_').lower()
             # https://github.com/paksu/pytelegraf
-            print(sanitized, power)
+            print('{}: {} W'.format(name, power))
 
             # Send to TICK
-            self._tick.metric(sanitized, {'power': power})
+            self.tick.metric(sanitized, {'power': power})
 
         # Send summed power to TICK
-        print(self.home, home_power)
-        self._tick.metric(self.home, home_power)
+        print('{}: {} W'.format(self.home_name, home_power))
+        self.tick.metric(self.home_name, home_power)
 
 
-kasa = KasaTick()
+# Args
+parser = argparse.ArgumentParser(description='''Queries locally discovered HS110 smart plugs for the current power usage. Pushes the power and summed power over all plugs to the TICK stack platform.
+The name of the metric in the TICK stack is the name of smart plug (in lower case and spaces replaced by underscores: e.g. Internet Power -> internet_power).''')
+parser.add_argument('--domain', help='Domain to discover', default='192.168.0.1/24')
+parser.add_argument('--home', help='Name of your home', default='home')
+parser.add_argument('--reset', help='Rediscover devices', action='store_true')
+args = parser.parse_args()
+
+kasa = KasaTick(args.domain, args.home, reset=args.reset)
 kasa.run()
