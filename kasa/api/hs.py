@@ -5,7 +5,7 @@ class HS(Kasa):
 
     def __init__(self , *args, **kwargs):
         Kasa.__init__(self, *args, **kwargs)
-        self.info : str = None
+        self.info = None
 
     def __str__(self):
         return self.get_name()

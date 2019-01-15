@@ -10,11 +10,11 @@ from api.hs110 import HS110
 
 class KasaTick:
     def __init__(self, home='home', domain='192.168.0.0/24'):
-        self.home : str = home
-        self.home_file : str = 'dat/{}.json'.format(home)
-        self.domain : str = domain
-        self._home : Home = None
-        self._tick : HttpClient = None
+        self.home = home
+        self.home_file = 'dat/{}.json'.format(home)
+        self.domain = domain
+        self._home = None
+        self._tick = None
 
     def run(self):
         # Connect to home and tick

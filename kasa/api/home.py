@@ -14,10 +14,10 @@ MODELS = {'HS': HS, 'HS100': HS100, 'HS110': HS110}
 
 class Home:
     def __init__(self, domain='192.168.0.0/24', port=9999, progs=('/mnt/c/Program Files (x86)/Nmap/nmap.exe', 'nmap')):
-        self.domain : str = domain
-        self.port : int = port
-        self.progs : list = progs
-        self.hs : dict = {}
+        self.domain = domain
+        self.port = port
+        self.progs = progs
+        self.hs = {}
 
     def reset(self):
         self.hs = {}
@@ -25,7 +25,7 @@ class Home:
     def get_all_items(self) -> List[Kasa]:
         return [item for items in self.hs.values() for item in items]
 
-    def get_items(self, model : str) -> List[Kasa]:
+    def get_items(self, model) -> List[Kasa]:
         if model in self.hs:
             return self.hs[model]
         return []
@@ -36,11 +36,11 @@ class Home:
     def load(self, cache='home.json'):
         # Load file
         with open(cache, 'rb') as fp:
-            raw : bytes = fp.read()
-        data : str = str(raw, 'utf-8')
+            raw = fp.read()
+        data = str(raw, 'utf-8')
 
         # Parse JSON
-        map : dict = json.loads(data)
+        map = json.loads(data)
 
         # Iterate of the data
         for model, items in map.items():
