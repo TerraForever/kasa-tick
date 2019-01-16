@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for polling the Kasa plugs
+
+[Timer]
+OnBootSec=20s
+OnCalendar=*:*:0/30
+
+[Install]
+WantedBy=timers.target

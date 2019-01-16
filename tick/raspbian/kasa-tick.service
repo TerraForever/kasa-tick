@@ -1,0 +1,8 @@
+[Unit]
+Description=Single polling of the Kasa plugs
+
+[Service]
+Type=oneshot
+User=pi
+ExecStart=/usr/bin/python3 kasa-tick.py
+WorkingDirectory=/home/pi/kasa-tick/kasa
