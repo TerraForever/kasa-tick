@@ -54,16 +54,20 @@ class KasaTick:
         # Iterate over plugs
         print('Querying {} HS110 plugs'.format(len(plugs)))
         for plug in plugs:
-            # Get plug info
-            name = plug.get_name()
-            power = plug.get_power()
-            home_power += power
-            sanitized = name.replace(' ', '_').lower()
-            # https://github.com/paksu/pytelegraf
-            print('{}: {} W'.format(name, power))
+            try:
+                # Get plug info
+                name = plug.get_name()
+                power = plug.get_power()
+                home_power += power
+                sanitized = name.replace(' ', '_').lower()
+                print('{}: {} W'.format(name, power))
 
-            # Send to TICK
-            self.tick.metric(sanitized, {'power': power})
+                # Send to TICK
+                self.tick.metric(sanitized, {'power': power})
+
+            except Exception as ex:
+                # Catch such that we can continue handling the other plugs
+                print('Warning: exception while handling plug {}: {}'.format(plug.get_host(), ex))
 
         # Send summed power to TICK
         print('{}: {} W'.format(self.home_name, home_power))
